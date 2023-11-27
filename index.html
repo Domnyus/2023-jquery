@@ -5,21 +5,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
 
     <title>Learning jQuery</title>
-    <script src="./jquery.js">
-
-        $("#formSample").validate({
-            debug: true
-        })
-        
-    </script>
 </head>
 
 <body>
-    <form id="formSample">
+    <div id="divErrors">
 
+    </div>
+
+    <form id="formSample">
+        <input class="ignore" name="username" type="text" min="1" />
+        <input type="submit" value="Enviar">
     </form>
+
+    <script src="./jquery.js">
+        // jQuery on load
+        $(document).ready(function () {
+            // Plugin validate
+            $("#formSample").validate({
+                // debug mode
+                debug: true,
+                // after submit
+                submitHandler: function(form)
+                {
+                    // force submit
+                    $(form).ajaxSubmit();
+                },
+                invalidHandler: function(event, validator)
+                {
+                    var errors = validator.numberOfInvalids();
+                    if(errors)
+                    {
+                        var message = errors == 1
+                            ? "You missed 1 field."
+                            : `You missed ${errors}`;
+                        
+                        $("divErrors").html(message);
+                    }
+                },
+                ignore: ".ignore",
+                rules: {
+                    // Form validation
+                    // name: { rule1: true || rule2: {param: 0, depends: function (e){ return if true; }}}
+                    username: {
+                        required: true,
+                        text: true,
+                        min: {
+                            param: 15,
+                            // conditional require
+                            depends: function(element)
+                            {
+                                return "condition";
+                            }
+                        }
+                    }
+                },
+                messages: {
+                    // Message for form validation
+                    username: {
+                        required: "This field is mandatory!",
+                        text: "This must be a text",
+                        // Can be a function
+                        minlenght: jQuery.validator.format("At least {0} chars!")
+                    }
+                },
+                groups: {
+                    // Groups error
+                    username: "username"
+                },
+                normalizer: {
+                    // Prepares elements
+                },
+                // The event
+                onsubmit: false,
+                onfocusout: function (element, event){
+                    // Validate after lose focus
+                },
+                // Validate while not error
+                onkeyup: false,
+                // Validate checkboxes, radion buttons and select on click
+                onclick: false,
+                // Focus last active or first invalid field
+                focusInvalid: true,
+                // hide errors invalidations
+                focusCleanup: true,
+                // What class to add to error elements
+                errorClass: "myErrorClass",
+                // What class to add to valid elements
+                validClass: "success",
+                // What element to create to show errors
+                errorElement: "label",
+                // 
+                wrapper: window,
+                // ID of error elements list
+                errorLabelContainer: "#errorList",
+                // ID of error elements container
+                errorContainer: "#errorContainer",
+                // errors handler
+                showErrors: function(erMap, erLi)
+                {
+
+                },
+                // Where to place error
+                errorPlacement: function(error, element)
+                {
+                    error.insertAfter("#username");
+                },
+                // class of success field
+                success: function (label, element)
+                {
+                    label.addClass("success").text("👍");
+                },
+                // handle the error element and class, customize the error
+                highlight: function(el, erCl)
+                {
+                    $(el).fadeOut();
+                },
+                // reverse the highlight function
+                unhighlight: function(el, erCl)
+                {
+
+                },
+                // ignore title attr
+                ignoreTitle: false
+            })
+        })
+    </script>
 </body>
 
 </html>
